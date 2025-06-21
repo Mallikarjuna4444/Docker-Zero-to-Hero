@@ -598,4 +598,51 @@ stages:
 
 ---
 
-If you want, I can provide similar YAML + Dockerfile examples for **Java or Python** Azure Functions containers! Would that be helpful?
+### Why `/home/site/wwwroot`?
+
+* **Azure Functions runtime expects your function app code inside `/home/site/wwwroot` directory inside the container.**
+
+* This is the **default working directory** where Azure Functions host looks for the function app files (function.json, binaries, etc).
+
+---
+
+### How does it relate to the Dockerfile?
+
+In the example Dockerfile:
+
+```dockerfile
+FROM mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet7
+WORKDIR /home/site/wwwroot
+COPY --from=build /app/publish .
+```
+
+* The `WORKDIR` sets the container's working directory to `/home/site/wwwroot`.
+* The `COPY` command copies the published build output from the build stage into `/home/site/wwwroot` inside the container.
+
+---
+
+### How does Azure Function App link to this?
+
+* When Azure runs your container, the **Functions host automatically serves from `/home/site/wwwroot`**.
+* Your container image must have the function app files in that directory to run properly.
+* If your app files are somewhere else in the container, the function host won’t find them, and the app will fail.
+
+---
+
+### Summary of `/home/site/wwwroot` role:
+
+| Purpose              | Explanation                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `/home/site/wwwroot` | **Default app root folder inside container** where Azure Functions runtime expects your code |
+| Dockerfile `WORKDIR` | Sets current directory inside container to `/home/site/wwwroot`                              |
+| Dockerfile `COPY`    | Copies your build output to `/home/site/wwwroot` so Functions runtime can load it            |
+
+---
+
+### So to **successfully deploy a containerized Azure Function:**
+
+* Your container image **must have the function app files at `/home/site/wwwroot`**.
+* Your Dockerfile should copy your build output there.
+* This directory is baked into the official Azure Functions base images and expected by the runtime.
+
+---

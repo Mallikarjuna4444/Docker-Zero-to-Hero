@@ -52,6 +52,51 @@ CMD ["node", "server.js"]
 
 > 🔁 Replace `server.js` with your actual entry point (e.g., `index.js`, `app.js`, or built file if using TypeScript).
 
+Yes — `EXPOSE 3000` in a Dockerfile **declares the container port** that the application is listening on.
+
+---
+
+## 🔍 What It Does
+
+```Dockerfile
+EXPOSE 3000
+```
+
+* Tells Docker (and anyone reading the Dockerfile) that the **application inside the container will listen on port 3000**.
+* It’s **informational** — it **does not actually publish** the port to the host machine.
+
+---
+
+## 🧱 Example Use Case
+
+If your app is a web server (e.g., Node.js, ASP.NET, etc.) running on port 3000 inside the container, you would:
+
+### In Dockerfile:
+
+```Dockerfile
+EXPOSE 3000
+```
+
+### Then run the container with:
+
+```bash
+docker run -p 8080:3000 my-app
+```
+
+* This maps **host port 8080** → **container port 3000**
+* So visiting `http://localhost:8080` accesses your app running inside the container.
+
+---
+
+## 📌 Summary
+
+| Item             | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| `EXPOSE 3000`    | Declares the container listens on port 3000      |
+| Is it required?  | ❌ Not required for the container to run          |
+| Does it publish? | ❌ No — use `-p` or `--publish` in `docker run`   |
+| Purpose          | 🧭 Informational, helps with documentation/tools |
+
 ---
 
 ## 📄 Example Project Structure
@@ -103,10 +148,3 @@ Then go to: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-Would you like a version with:
-
-* **TypeScript** support?
-* **PM2** process manager for production clustering?
-* Or a `docker-compose.yml` setup with MongoDB or Redis?
-
-Let me know!

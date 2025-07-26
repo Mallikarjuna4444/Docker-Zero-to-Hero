@@ -36,6 +36,51 @@ ENTRYPOINT ["dotnet", "YourApp.dll"]
 > 🔁 Replace `YourApp.dll` with the actual name of your app's DLL (usually the `.csproj` filename).
 
 ---
+Excellent question!
+
+In a .NET Docker build, you might wonder:
+
+> "Do we need to run `dotnet build` before `dotnet publish`?"
+
+### ✅ **Short answer**:
+
+**No, you don’t need a separate `dotnet build`** — `dotnet publish` **includes the build step** internally.
+
+---
+
+### 🔍 Explanation:
+
+| Command          | What it does                                                            |
+| ---------------- | ----------------------------------------------------------------------- |
+| `dotnet build`   | Compiles the app, producing intermediate output (DLLs in `bin/`)        |
+| `dotnet publish` | Builds **and** packages the app for deployment (into a clean directory) |
+
+So this:
+
+```bash
+dotnet publish -c Release -o /app/publish
+```
+
+✔️ **Compiles the code**
+✔️ **Packages it for deployment**
+✔️ **Skips extra files** (like `.csproj`, `.cs`, test assets, etc.)
+
+---
+
+### 🧱 Typical Docker Best Practice:
+
+In Dockerfiles, it's **best practice** to go straight to `dotnet publish` — because:
+
+* It **builds + optimizes** in one step
+* It outputs **only what’s needed** to run the app
+* Keeps the final image **clean and small**
+
+---
+
+### ✅ Final Takeaway:
+
+> Use only `dotnet publish` in your Dockerfile.
+> It does everything needed — no separate `dotnet build` required.
 
 ## 📁 Example File Structure
 
